@@ -1,0 +1,65 @@
+<section class="front-office">
+  <header class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Front Office</span>
+      <h1>Encontre a propriedade ideal e os serviços certos.</h1>
+      <p>
+        Oferecemos soluções para locação, manutenção, visitas e organização de imóveis com
+        atenção ao detalhe e atendimento profissional.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/propriedades" class="primary-btn">Ver propriedades</a>
+        <a routerLink="/servicos" class="secondary-btn">Ver serviços</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <span class="badge">Disponível</span>
+      <h2>Oferta do mês</h2>
+      <p>Casas e apartamentos em zonas premium com condições flexíveis.</p>
+      <strong>Desde 220.000 Kz</strong>
+    </div>
+  </header>
+
+  <section class="services">
+    <div class="section-heading">
+      <span>Serviços</span>
+      <h2>Tipos de serviço</h2>
+    </div>
+
+    <div class="service-grid">
+      @for (servico of servicos; track servico.nome) {
+        <article class="service-card">
+          <div class="icon material-symbols-rounded" aria-hidden="true">{{ servico.icone }}</div>
+          <h3>{{ servico.nome }}</h3>
+          <p>{{ servico.descricao }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="properties">
+    <div class="section-heading">
+      <span>Propriedades</span>
+      <h2>Em destaque</h2>
+    </div>
+
+    <div class="property-grid">
+      @for (propriedade of propriedades(); track propriedade.id) {
+        <article class="property-card">
+          @if (propriedade.imagens?.[0]) {
+            <img [ngSrc]="propriedade.imagens[0]" [alt]="propriedade.item" width="800" height="500" />
+          }
+          <div class="card-body">
+            <div class="meta-row">
+              <span class="tag">{{ propriedade.tipologia }}</span>
+              <strong>{{ propriedade.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
+            </div>
+            <h3>{{ propriedade.item }}</h3>
+            <p>{{ propriedade.descricao }}</p>
+            <small>{{ propriedade.localizacao?.bairro }} · {{ propriedade.localizacao?.provincia }}</small>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+</section>

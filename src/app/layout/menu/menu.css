@@ -1,0 +1,108 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 3vw, 2.5rem);
+  background: rgba(0, 0, 0, 0.9);
+  border-bottom: 1px solid rgba(1, 231, 204, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #01e7cc, #00b9a0);
+  color: #000;
+  font-weight: 800;
+}
+
+.brand-name {
+  display: block;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand-block small {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.main-nav a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.main-nav a.active,
+.main-nav a:hover {
+  background: rgba(1, 231, 204, 0.12);
+  color: #01e7cc;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.7rem 1.1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.nav-button.primary {
+  background: linear-gradient(135deg, #01e7cc, #00b9a0);
+  color: #000;
+}
+
+.nav-button.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .brand-block,
+  .main-nav,
+  .nav-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}

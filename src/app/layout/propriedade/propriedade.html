@@ -1,0 +1,111 @@
+<section class="propriedade-crud">
+  <div class="header-row">
+    <h2>Gestão de propriedades</h2>
+    <button type="button" class="primary" (click)="openCreateForm()">
+      + Nova propriedade
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading-skeleton propriedade-skeleton" aria-live="polite" aria-busy="true">
+    <div class="skeleton skeleton-header-small"></div>
+    <div class="skeleton skeleton-form"></div>
+    <div class="skeleton skeleton-table"></div>
+  </div>
+
+  <form [formGroup]="propriedadeForm" (ngSubmit)="save()" class="propriedade-form">
+    <div class="grid">
+      <label>
+        <span>Nome da propriedade *</span>
+        <input type="text" formControlName="item" />
+        <small class="error-text" *ngIf="showError('item') as error">{{ error }}</small>
+      </label>
+
+      <label>
+        <span>Tipologia *</span>
+        <select formControlName="tipologia">
+          <option *ngFor="let tipo of tipologias" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </label>
+
+      <label class="full-width">
+        <span>Descrição *</span>
+        <textarea rows="3" formControlName="descricao"></textarea>
+        <small class="error-text" *ngIf="showError('descricao') as error">{{ error }}</small>
+      </label>
+
+      <label>
+        <span>Preço *</span>
+        <input type="number" min="0" step="0.01" formControlName="preco" />
+        <small class="error-text" *ngIf="showError('preco') as error">{{ error }}</small>
+      </label>
+
+      <label class="full-width">
+        <span>Imagens (separadas por vírgula)</span>
+        <input type="text" formControlName="imagens" />
+        <small class="error-text" *ngIf="showError('imagens') as error">{{ error }}</small>
+      </label>
+
+      <label>
+        <span>Província *</span>
+        <input type="text" formControlName="provincia" />
+        <small class="error-text" *ngIf="showError('provincia') as error">{{ error }}</small>
+      </label>
+
+      <label>
+        <span>Bairro *</span>
+        <input type="text" formControlName="bairro" />
+        <small class="error-text" *ngIf="showError('bairro') as error">{{ error }}</small>
+      </label>
+
+      <label>
+        <span>Rua *</span>
+        <input type="text" formControlName="rua" />
+        <small class="error-text" *ngIf="showError('rua') as error">{{ error }}</small>
+      </label>
+
+      <label>
+        <span>Referência *</span>
+        <input type="text" formControlName="referencia" />
+        <small class="error-text" *ngIf="showError('referencia') as error">{{ error }}</small>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="primary" [disabled]="propriedadeForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Salvando...' : (isEditing() ? 'Atualizar' : 'Salvar') }}
+      </button>
+    </div>
+  </form>
+
+  <div class="list">
+    <h3>Propriedades cadastradas</h3>
+
+    <div *ngIf="!isLoading() && propriedades().length === 0" class="empty">
+      Nenhuma propriedade cadastrada.
+    </div>
+
+    <table *ngIf="propriedades().length > 0">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Tipologia</th>
+          <th>Preço</th>
+          <th>Localização</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let propriedade of propriedades()">
+          <td>{{ propriedade.item }}</td>
+          <td>{{ propriedade.tipologia }}</td>
+          <td>{{ propriedade.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</td>
+          <td>{{ propriedade.localizacao?.bairro }}, {{ propriedade.localizacao?.provincia }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="openEditForm(propriedade)">Editar</button>
+            <button type="button" class="danger" (click)="deletePropriedade(propriedade.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

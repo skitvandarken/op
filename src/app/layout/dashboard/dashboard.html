@@ -1,0 +1,646 @@
+<section class="dashboard-shell">
+  <div class="topbar">
+    <h1>Dashboard do sistema</h1>
+    <div class="tabs">
+      <button type="button" [class.active]="activeTab() === 'clientes'" (click)="setTab('clientes')">Clientes</button>
+      <button type="button" [class.active]="activeTab() === 'propriedades'" (click)="setTab('propriedades')">Propriedades</button>
+      <button type="button" [class.active]="activeTab() === 'pedidos'" (click)="setTab('pedidos')">Pedidos</button>
+      <button type="button" [class.active]="activeTab() === 'operativos'" (click)="setTab('operativos')">Operativos</button>
+      <button type="button" [class.active]="activeTab() === 'meios'" (click)="setTab('meios')">Meios</button>
+      <button type="button" [class.active]="activeTab() === 'intermediarios'" (click)="setTab('intermediarios')">Intermediários</button>
+      <button type="button" [class.active]="activeTab() === 'reclamacoes'" (click)="setTab('reclamacoes')">Reclamações</button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading-skeleton dashboard-skeleton" aria-live="polite" aria-busy="true">
+    <div class="skeleton skeleton-topbar"></div>
+    <div class="skeleton skeleton-tabs"></div>
+    <div class="skeleton skeleton-panel"></div>
+    <div class="skeleton-grid">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'clientes'">
+    <h2>Clientes</h2>
+    <form [formGroup]="clienteForm" (ngSubmit)="saveCliente()" class="form-grid">
+      <label>
+        <span>Nome</span>
+        <input type="text" formControlName="nome" />
+        <small class="error-text" *ngIf="showError(clienteForm, 'nome') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Email</span>
+        <input type="email" formControlName="email" />
+        <small class="error-text" *ngIf="showError(clienteForm, 'email') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Telefone</span>
+        <input type="tel" formControlName="telefone" />
+        <small class="error-text" *ngIf="showError(clienteForm, 'telefone') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Tipo</span>
+        <select formControlName="tipo">
+          <option *ngFor="let tipo of tiposCliente" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Cidade</span>
+        <input type="text" formControlName="cidade" />
+        <small class="error-text" *ngIf="showError(clienteForm, 'cidade') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Bairro</span>
+        <input type="text" formControlName="bairro" />
+        <small class="error-text" *ngIf="showError(clienteForm, 'bairro') as error">{{ error }}</small>
+      </label>
+      <label class="full">
+        <span>Rua</span>
+        <input type="text" formControlName="rua" />
+        <small class="error-text" *ngIf="showError(clienteForm, 'rua') as error">{{ error }}</small>
+      </label>
+      <label class="full">
+        <span>Observações</span>
+        <textarea rows="3" formControlName="observacoes"></textarea>
+        <small class="error-text" *ngIf="showError(clienteForm, 'observacoes') as error">{{ error }}</small>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingClienteId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetClienteForm()">Limpar</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Tipo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes()">
+          <td>{{ cliente.nome }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>{{ cliente.telefone }}</td>
+          <td>{{ cliente.tipo }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editCliente(cliente)">Editar</button>
+            <button type="button" class="danger" (click)="deleteCliente(cliente.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'propriedades'">
+    <h2>Propriedades</h2>
+    <form [formGroup]="propriedadeForm" (ngSubmit)="savePropriedade()" class="form-grid">
+      <label>
+        <span>Nome</span>
+        <input type="text" formControlName="item" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'item') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Tipologia</span>
+        <select formControlName="tipologia">
+          <option *ngFor="let tipo of tipologias" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </label>
+      <label class="full">
+        <span>Descrição</span>
+        <textarea rows="3" formControlName="descricao"></textarea>
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'descricao') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Preço (AOA)</span>
+        <input type="number" formControlName="preco" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'preco') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Intermediário</span>
+        <input
+          type="text"
+          list="propriedade-intermediario-search"
+          [value]="intermediarioLookupValue(propriedadeForm.get('idIntermediario')?.value)"
+          (change)="selecionarIntermediarioPropriedade($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="propriedade-intermediario-search">
+          <option *ngFor="let intermediario of intermediarios()" [value]="intermediarioPesquisaLabel(intermediario)"></option>
+        </datalist>
+      </label>
+      <label class="full">
+        <span>Imagens</span>
+        <input type="text" formControlName="imagens" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'imagens') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Província</span>
+        <input type="text" formControlName="provincia" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'provincia') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Bairro</span>
+        <input type="text" formControlName="bairro" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'bairro') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Rua</span>
+        <input type="text" formControlName="rua" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'rua') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Referência</span>
+        <input type="text" formControlName="referencia" />
+        <small class="error-text" *ngIf="showError(propriedadeForm, 'referencia') as error">{{ error }}</small>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingPropriedadeId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetPropriedadeForm()">Limpar</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Tipologia</th>
+          <th>Preço</th>
+          <th>Intermediário</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let propriedade of propriedades()">
+          <td>{{ propriedade.item }}</td>
+          <td>{{ propriedade.tipologia }}</td>
+          <td>{{ propriedade.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</td>
+          <td>{{ propriedade.intermediarioNome || 'Sem intermediário' }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editPropriedade(propriedade)">Editar</button>
+            <button type="button" class="danger" (click)="deletePropriedade(propriedade.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'pedidos'">
+    <h2>Pedidos</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span>Receita gerada diária</span>
+        <strong>{{ receitaTotal('Diária') | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
+      </div>
+      <div class="stat-card">
+        <span>Receita gerada semanal</span>
+        <strong>{{ receitaTotal('Semanal') | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
+      </div>
+      <div class="stat-card">
+        <span>Receita gerada mensal</span>
+        <strong>{{ receitaTotal('Mensal') | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
+      </div>
+      <div class="stat-card">
+        <span>Receita gerada anual</span>
+        <strong>{{ receitaTotal('Anual') | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
+      </div>
+    </div>
+
+    <form [formGroup]="pedidoForm" (ngSubmit)="savePedido()" class="form-grid">
+      <label>
+        <span>Tipo</span>
+        <select formControlName="tipo">
+          <option *ngFor="let tipo of tiposPedido" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Status</span>
+        <select formControlName="status">
+          <option *ngFor="let status of statusPedido" [value]="status">{{ status }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Preço (AOA)</span>
+        <input type="number" formControlName="preco" />
+        <small class="error-text" *ngIf="showError(pedidoForm, 'preco') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Cliente</span>
+        <input
+          type="text"
+          list="pedido-cliente-search"
+          [value]="clienteLookupValue(pedidoForm.get('idCliente')?.value)"
+          (change)="selecionarClientePedido($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="pedido-cliente-search">
+          <option *ngFor="let cliente of clientes()" [value]="clientePesquisaLabel(cliente)"></option>
+        </datalist>
+        <small class="error-text" *ngIf="showError(pedidoForm, 'idCliente') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Propriedade</span>
+        <input
+          type="text"
+          list="pedido-propriedade-search"
+          [value]="propriedadeLookupValue(pedidoForm.get('idPropriedade')?.value)"
+          (change)="selecionarPropriedadePedido($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="pedido-propriedade-search">
+          <option *ngFor="let propriedade of propriedades()" [value]="propriedadePesquisaLabel(propriedade)"></option>
+        </datalist>
+        <small class="error-text" *ngIf="showError(pedidoForm, 'idPropriedade') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Operativo</span>
+        <input
+          type="text"
+          list="pedido-operativo-search"
+          [value]="operativoLookupValue(pedidoForm.get('idOperativo')?.value)"
+          (change)="selecionarOperativoPedido($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="pedido-operativo-search">
+          <option *ngFor="let operativo of operativos()" [value]="operativoPesquisaLabel(operativo)"></option>
+        </datalist>
+      </label>
+      <label class="full">
+        <span>Observações</span>
+        <textarea rows="3" formControlName="observacoes"></textarea>
+        <small class="error-text" *ngIf="showError(pedidoForm, 'observacoes') as error">{{ error }}</small>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingPedidoId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetPedidoForm()">Limpar</button>
+      </div>
+    </form>
+
+    <div class="toolbar-row">
+      <label>
+        <span>Filtrar por status</span>
+        <select [value]="pedidoStatusFilter()" (change)="pedidoStatusFilter.set($any($event.target).value)">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let status of statusPedido" [value]="status">{{ status }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Ordenar por</span>
+        <select [value]="pedidoSortMode()" (change)="pedidoSortMode.set($any($event.target).value)">
+          <option value="mais_recente">Mais recente</option>
+          <option value="mais_antigo">Mais antigo</option>
+          <option value="maior_valor">Maior valor</option>
+          <option value="menor_valor">Menor valor</option>
+        </select>
+      </label>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tipo</th>
+          <th>Status</th>
+          <th>Cliente</th>
+          <th>Propriedade</th>
+          <th>Preço</th>
+          <th>Operativo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pedido of getPedidosFiltrados()">
+          <td>{{ pedido.id }}</td>
+          <td>{{ pedido.tipo }}</td>
+          <td>{{ pedido.status }}</td>
+          <td>{{ pedido.clienteNome }}</td>
+          <td>{{ pedido.propriedadeItem }}</td>
+          <td>{{ pedido.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</td>
+          <td>{{ displayPedidoOperativo(pedido) }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editPedido(pedido)">Editar</button>
+            <button type="button" class="danger" (click)="deletePedido(pedido.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'operativos'">
+    <h2>Operativos</h2>
+    <form [formGroup]="operativoForm" (ngSubmit)="saveOperativo()" class="form-grid">
+      <label>
+        <span>Nome</span>
+        <input type="text" formControlName="nome" />
+      </label>
+      <label>
+        <span>Email</span>
+        <input type="email" formControlName="email" />
+      </label>
+      <label>
+        <span>Telefone</span>
+        <input type="tel" formControlName="telefone" />
+      </label>
+      <label>
+        <span>Meio</span>
+        <select formControlName="meioId">
+          <option value="">Selecione</option>
+          <option *ngFor="let meio of meios()" [value]="meio.id">{{ meio.marca }} {{ meio.modelo }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Cidade</span>
+        <input type="text" formControlName="cidade" />
+      </label>
+      <label>
+        <span>Bairro</span>
+        <input type="text" formControlName="bairro" />
+      </label>
+      <label>
+        <span>Rua</span>
+        <input type="text" formControlName="rua" />
+      </label>
+      <label>
+        <span>Licença</span>
+        <input type="text" formControlName="licenca" />
+      </label>
+      <label>
+        <span>Cartão de condução</span>
+        <input type="text" formControlName="cartadeconducao" />
+      </label>
+      <label>
+        <span>Validade licença</span>
+        <input type="text" formControlName="validadeLicensa" />
+      </label>
+      <label>
+        <span>Nº bilhetes</span>
+        <input type="number" formControlName="numeroBilhetes" />
+      </label>
+      <label>
+        <span>Validade bilhete</span>
+        <input type="text" formControlName="validadeBilhete" />
+      </label>
+      <label class="full">
+        <span>Observações</span>
+        <textarea rows="3" formControlName="observacoes"></textarea>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingOperativoId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetOperativoForm()">Limpar</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Meio</th>
+          <th>Telefone</th>
+          <th>Pedidos</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let operativo of operativos()">
+          <td>{{ operativo.nome }}</td>
+          <td>{{ operativo.meioNome || operativo.meioId }}</td>
+          <td>{{ operativo.telefone }}</td>
+          <td>{{ operativo.pedidosRespondidos ?? 0 }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editOperativo(operativo)">Editar</button>
+            <button type="button" class="danger" (click)="deleteOperativo(operativo.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'meios'">
+    <h2>Meios</h2>
+    <form [formGroup]="meioForm" (ngSubmit)="saveMeio()" class="form-grid">
+      <label>
+        <span>Tipo</span>
+        <select formControlName="tipo">
+          <option *ngFor="let tipo of tiposMeio" [value]="tipo">{{ tipo }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Marca</span>
+        <input type="text" formControlName="marca" />
+      </label>
+      <label>
+        <span>Modelo</span>
+        <input type="text" formControlName="modelo" />
+      </label>
+      <label>
+        <span>Matrícula</span>
+        <input type="text" formControlName="matricula" />
+      </label>
+      <label>
+        <span>Operativo</span>
+        <select formControlName="operativoId">
+          <option value="">Sem operativo</option>
+          <option *ngFor="let operativo of operativos()" [value]="operativo.id">{{ operativo.nome }}</option>
+        </select>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingMeioId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetMeioForm()">Limpar</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Matrícula</th>
+          <th>Operativo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let meio of meios()">
+          <td>{{ meio.tipo }}</td>
+          <td>{{ meio.marca }}</td>
+          <td>{{ meio.modelo }}</td>
+          <td>{{ meio.matricula }}</td>
+          <td>{{ meio.operativoNome || 'Sem operativo' }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editMeio(meio)">Editar</button>
+            <button type="button" class="danger" (click)="deleteMeio(meio.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'intermediarios'">
+    <h2>Intermediários</h2>
+    <form [formGroup]="intermediarioForm" (ngSubmit)="saveIntermediario()" class="form-grid">
+      <label>
+        <span>Nome</span>
+        <input type="text" formControlName="nome" />
+      </label>
+      <label>
+        <span>Email</span>
+        <input type="email" formControlName="email" />
+      </label>
+      <label>
+        <span>Telefone</span>
+        <input type="tel" formControlName="telefone" />
+      </label>
+      <label>
+        <span>Documento</span>
+        <input type="text" formControlName="documento" />
+      </label>
+      <label>
+        <span>Cidade</span>
+        <input type="text" formControlName="cidade" />
+      </label>
+      <label>
+        <span>Bairro</span>
+        <input type="text" formControlName="bairro" />
+      </label>
+      <label>
+        <span>Rua</span>
+        <input type="text" formControlName="rua" />
+      </label>
+      <label class="full">
+        <span>Observações</span>
+        <textarea rows="3" formControlName="observacoes"></textarea>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingIntermediarioId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetIntermediarioForm()">Limpar</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Documento</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let intermediario of intermediarios()">
+          <td>{{ intermediario.nome }}</td>
+          <td>{{ intermediario.email }}</td>
+          <td>{{ intermediario.telefone }}</td>
+          <td>{{ intermediario.documento }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editIntermediario(intermediario)">Editar</button>
+            <button type="button" class="danger" (click)="deleteIntermediario(intermediario.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" *ngIf="activeTab() === 'reclamacoes'">
+    <h2>Reclamações</h2>
+    <form [formGroup]="reclamacaoForm" (ngSubmit)="saveReclamacao()" class="form-grid">
+      <label>
+        <span>Título</span>
+        <input type="text" formControlName="titulo" />
+        <small class="error-text" *ngIf="showError(reclamacaoForm, 'titulo') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Status</span>
+        <select formControlName="status">
+          <option *ngFor="let status of statusReclamacao" [value]="status">{{ status }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Cliente</span>
+        <input
+          type="text"
+          list="reclamacao-cliente-search"
+          [value]="clienteLookupValue(reclamacaoForm.get('idCliente')?.value)"
+          (change)="selecionarClienteReclamacao($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="reclamacao-cliente-search">
+          <option *ngFor="let cliente of clientes()" [value]="clientePesquisaLabel(cliente)"></option>
+        </datalist>
+        <small class="error-text" *ngIf="showError(reclamacaoForm, 'idCliente') as error">{{ error }}</small>
+      </label>
+      <label>
+        <span>Propriedade</span>
+        <input
+          type="text"
+          list="reclamacao-propriedade-search"
+          [value]="propriedadeLookupValue(reclamacaoForm.get('idPropriedade')?.value)"
+          (change)="selecionarPropriedadeReclamacao($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="reclamacao-propriedade-search">
+          <option *ngFor="let propriedade of propriedades()" [value]="propriedadePesquisaLabel(propriedade)"></option>
+        </datalist>
+        <small class="error-text" *ngIf="showError(reclamacaoForm, 'idPropriedade') as error">{{ error }}</small>
+      </label>
+      <label class="full">
+        <span>Descrição</span>
+        <textarea rows="4" formControlName="descricao"></textarea>
+        <small class="error-text" *ngIf="showError(reclamacaoForm, 'descricao') as error">{{ error }}</small>
+      </label>
+      <label class="full">
+        <span>Intermediário</span>
+        <input
+          type="text"
+          list="reclamacao-intermediario-search"
+          [value]="intermediarioLookupValue(reclamacaoForm.get('idIntermediario')?.value)"
+          (change)="selecionarIntermediarioReclamacao($any($event.target).value)"
+          placeholder="Pesquise por nome ou ID"
+        />
+        <datalist id="reclamacao-intermediario-search">
+          <option *ngFor="let intermediario of intermediarios()" [value]="intermediarioPesquisaLabel(intermediario)"></option>
+        </datalist>
+        <small class="error-text" *ngIf="showError(reclamacaoForm, 'idIntermediario') as error">{{ error }}</small>
+      </label>
+      <div class="actions full">
+        <button type="submit" class="primary">{{ editingReclamacaoId() ? 'Atualizar' : 'Salvar' }}</button>
+        <button type="button" class="secondary" (click)="resetReclamacaoForm()">Limpar</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Cliente</th>
+          <th>Propriedade</th>
+          <th>Intermediário</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reclamacao of reclamacoes()">
+          <td>{{ reclamacao.titulo }}</td>
+          <td>{{ reclamacao.clienteNome || reclamacao.idCliente }}</td>
+          <td>{{ reclamacao.propriedadeItem || reclamacao.idPropriedade }}</td>
+          <td>{{ reclamacao.intermediarioNome || reclamacao.idIntermediario }}</td>
+          <td>{{ reclamacao.status }}</td>
+          <td class="actions-cell">
+            <button type="button" class="secondary" (click)="editReclamacao(reclamacao)">Editar</button>
+            <button type="button" class="danger" (click)="deleteReclamacao(reclamacao.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

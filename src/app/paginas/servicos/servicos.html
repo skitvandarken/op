@@ -1,0 +1,94 @@
+<section class="servicos-page">
+  <header class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Serviços</span>
+      <h1>Soluções completas para imóveis, visitas e operação diária.</h1>
+      <p>
+        A nossa equipa apoia clientes, proprietários e operacionais com serviços práticos,
+        seguros e orientados para resultados rápidos.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/propriedades" class="primary-btn">Ver propriedades</a>
+        <a routerLink="/dashboard" class="secondary-btn">Solicitar gestão</a>
+      </div>
+    </div>
+
+    <div class="hero-panel">
+      <div class="mini-stat">
+        <span class="label">Cobertura</span>
+        <strong>Luanda</strong>
+      </div>
+      <div class="mini-stat">
+        <span class="label">Resposta</span>
+        <strong>24h</strong>
+      </div>
+      <div class="mini-stat accent">
+        <span class="label">Atendimento</span>
+        <strong>Premium</strong>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-heading">
+      <span>O que fazemos</span>
+      <h2>Serviços pensados para cada etapa do imóvel</h2>
+    </div>
+
+    <div class="service-grid">
+      @for (servico of servicos; track servico.nome) {
+        <article class="service-card">
+          <div class="service-icon material-symbols-rounded" aria-hidden="true">{{ servico.icone }}</div>
+          <span class="service-tag">{{ servico.destaque }}</span>
+          <h3>{{ servico.nome }}</h3>
+          <p>{{ servico.descricao }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="section benefits">
+    <div class="benefits-copy">
+      <span class="eyebrow">Vantagens</span>
+      <h2>Organização, acompanhamento e qualidade em cada atendimento.</h2>
+      <p>
+        Unimos gestão, operação e relacionamento para oferecer uma experiência mais clara e segura,
+        com foco em evitar atrasos e reduzir a pressão do cliente.
+      </p>
+    </div>
+
+    <ul class="benefits-list">
+      @for (beneficio of beneficios; track beneficio) {
+        <li>
+          <span class="check material-symbols-rounded" aria-hidden="true">check_circle</span>
+          <span>{{ beneficio }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="section process">
+    <div class="section-heading">
+      <span>Como funciona</span>
+      <h2>Um processo simples e eficiente</h2>
+    </div>
+
+    <div class="steps-grid">
+      @for (etapa of etapas; track etapa.titulo) {
+        <article class="step-card">
+          <span class="step-number">0{{ $index + 1 }}</span>
+          <h3>{{ etapa.titulo }}</h3>
+          <p>{{ etapa.texto }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="cta-panel">
+    <div>
+      <span class="eyebrow">Pronto para começar?</span>
+      <h2>Precisa de apoio para arrendar, manter ou gerir um imóvel?</h2>
+    </div>
+    <a routerLink="/dashboard" class="primary-btn">Falar com a equipa</a>
+  </section>
+</section>

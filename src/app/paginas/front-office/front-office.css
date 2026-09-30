@@ -1,0 +1,271 @@
+:host {
+  display: block;
+  --mui-primary: #1976d2;
+  --mui-primary-dark: #1257a6;
+  --mui-primary-container: #dfeeff;
+  --mui-secondary-container: #e8f1ff;
+  --mui-surface: #ffffff;
+  --mui-surface-alt: #f4f7fb;
+  --mui-border: rgba(15, 23, 42, 0.09);
+  --mui-text: #10233f;
+  --mui-muted: #53657d;
+  --mui-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --mui-shadow-2: 0 8px 24px rgba(25, 118, 210, 0.12);
+  --mui-shadow-3: 0 18px 42px rgba(17, 24, 39, 0.12);
+}
+
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Rounded';
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.front-office {
+  display: flex;
+  flex-direction: column;
+  gap: 3.25rem;
+  padding: 2rem clamp(1rem, 2vw, 2.5rem) 4rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+  color: var(--mui-text);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.hero-copy,
+.hero-card,
+.service-card,
+.property-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--mui-border);
+  border-radius: 24px;
+  box-shadow: var(--mui-shadow-2);
+}
+
+.hero-copy {
+  padding: clamp(1.5rem, 3vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255,255,255,0.99), rgba(239,246,255,0.92));
+  border: 1px solid rgba(25, 118, 210, 0.08);
+}
+
+.eyebrow,
+.section-heading span,
+.badge,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.badge,
+.tag {
+  background: rgba(25, 118, 210, 0.12);
+  color: var(--mui-primary);
+}
+
+.badge {
+  align-self: flex-start;
+}
+
+.hero-copy h1 {
+  margin: 1rem 0 0.9rem;
+  font-size: clamp(2.3rem, 4vw, 4.3rem);
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+}
+
+.hero-copy p {
+  margin: 0;
+  color: var(--mui-muted);
+  font-size: 1.03rem;
+  line-height: 1.8;
+  max-width: 62ch;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.6rem;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.85rem 1.35rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--mui-primary), var(--mui-primary-dark));
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(25, 118, 210, 0.28);
+}
+
+.secondary-btn {
+  background: #edf3fd;
+  color: var(--mui-text);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.hero-card {
+  padding: 1.75rem;
+  background: linear-gradient(180deg, #10233f 0%, #173a68 100%);
+  color: #f8fbff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 260px;
+}
+
+.hero-card h2 {
+  margin: 1rem 0 0.6rem;
+  font-size: clamp(1.7rem, 2vw, 2.4rem);
+}
+
+.hero-card p {
+  margin: 0;
+  color: rgba(248, 251, 255, 0.8);
+  line-height: 1.7;
+}
+
+.hero-card strong {
+  margin-top: 1rem;
+  font-size: 1.8rem;
+  color: #ffca28;
+}
+
+.services,
+.properties {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 2vw, 2.4rem);
+  line-height: 1.2;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.service-card {
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,247,251,0.9));
+}
+
+.service-card:hover,
+.property-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 52px rgba(25, 118, 210, 0.12);
+}
+
+.icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--mui-primary-container), rgba(25, 118, 210, 0.14));
+  color: var(--mui-primary);
+  margin-bottom: 1rem;
+  box-shadow: inset 0 0 0 1px rgba(25, 118, 210, 0.08);
+}
+
+.service-card h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.2rem;
+}
+
+.service-card p,
+.property-card p,
+.property-card small {
+  color: var(--mui-muted);
+  line-height: 1.7;
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.property-card {
+  overflow: hidden;
+}
+
+.property-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background: #dfeaf8;
+  display: block;
+}
+
+.card-body {
+  padding: 1.25rem 1.25rem 1.4rem;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.property-card h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.35rem;
+}
+
+.property-card strong {
+  color: var(--mui-text);
+  font-size: 1.15rem;
+}
+
+@media (max-width: 960px) {
+  .hero,
+  .service-grid,
+  .property-grid {
+    grid-template-columns: 1fr;
+  }
+}
