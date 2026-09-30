@@ -55,7 +55,7 @@ jobs:
       - name: 🐛 Verify Build Output
         run: |
           echo "Build directory contents:"
-          ls -la dist/tcsaoficial/browser
+          ls -la dist/op/browser
           echo "Total files to upload: $(find dist/op/browser -type f | wc -l)"
 
       - name: 🧹 Secure Clean & Deploy via WebDAV
