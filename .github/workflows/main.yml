@@ -1,4 +1,4 @@
-name: 🚀Angular Deploy with Firebase - Classic
+name: 🚀Angular Deploy with Firebase 
 on:
   push:
     branches:
