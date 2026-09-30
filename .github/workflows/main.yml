@@ -1,0 +1,192 @@
+name: 🚀Angular Deploy with Firebase
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛠️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: 🔐 Inject Secrets into Environment File
+        run: |
+          # Ensure environments directory exists
+          mkdir -p src/environments
+
+          # Create production environment file dynamically
+          cat > src/environments/environment.prod.ts <<EOF
+          export const environment = {
+            production: true,
+            firebase: {
+              apiKey: '${{ secrets.FIREBASE_API_KEY }}',
+              authDomain: '${{ secrets.FIREBASE_AUTH_DOMAIN }}',
+              projectId: '${{ secrets.FIREBASE_PROJECT_ID }}',
+              storageBucket: '${{ secrets.FIREBASE_STORAGE_BUCKET }}',
+              messagingSenderId: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}',
+              appId: '${{ secrets.FIREBASE_APP_ID }}'
+            },
+            auth0: {
+              domain: '${{ secrets.AUTH0_DOMAIN }}',
+              clientId: '${{ secrets.AUTH0_CLIENT_ID }}'
+            }
+          };
+          EOF
+
+          # Verify file structure was created (without printing sensitive credentials)
+          grep "production:" src/environments/environment.prod.ts
+
+      - name: 📌 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🏗️ Build Angular App
+        run: npm run build -- --configuration production
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+
+      - name: 🐛 Verify Build Output
+        run: |
+          echo "Build directory contents:"
+          ls -la dist/tcsaoficial/browser
+          echo "Total files to upload: $(find dist/op/browser -type f | wc -l)"
+
+      - name: 🧹 Secure Clean & Deploy via WebDAV
+        env:
+          WEBDISK_USERNAME: ${{ secrets.WEBDISK_USERNAME }}
+          WEBDISK_PASSWORD: ${{ secrets.WEBDISK_PASSWORD }}
+        run: |
+          # ===== CONFIGURATION =====
+          BUILD_DIR="dist/op/browser"
+          WEBDISK_URL="https://operativuz.com:2078"
+
+          # Base path on server (remove if deploying to root)
+          REMOTE_BASE_PATH=""  # Change to "subfolder/" if needed
+
+          # Protected items (won't be touched)
+          PROTECTED_ITEMS=(
+           
+          )
+          # =========================
+
+          # 🔐 Verify WebDAV connection
+          echo "🔐 Testing WebDAV connection..."
+          if ! curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X PROPFIND $WEBDISK_URL/ --fail --silent --show-error 2>&1; then
+            echo "❌ FATAL: WebDAV authentication failed!"
+            exit 1
+          fi
+          echo "✅ WebDAV connection successful!"
+
+          # 🗑️ Get remote items using xmlstarlet
+          echo "📡 Fetching remote file list..."
+          sudo apt-get update && sudo apt-get install -y xmlstarlet
+
+          REMOTE_ITEMS=$(curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X PROPFIND $WEBDISK_URL/ --silent 2>&1 | \
+            xmlstarlet sel -t -v "//a:href" -n 2>/dev/null | \
+            sed "s|$WEBDISK_URL||g" | sed 's|^/||' | grep -v '^$' | sort -u)
+
+          echo "Found remote items:"
+          echo "$REMOTE_ITEMS"
+
+          # 💣 Delete non-protected items
+          echo "🧹 Starting cleanup..."
+          for item in $REMOTE_ITEMS; do
+            [[ -z "$item" ]] && continue
+            
+            protected=false
+            for protected_item in "${PROTECTED_ITEMS[@]}"; do
+              if [[ "$item" == "$protected_item" ]] || [[ "$item" == "$protected_item/"* ]]; then
+                protected=true
+                break
+              fi
+            done
+
+            if ! $protected; then
+              echo "🗑️ Deleting: $item"
+              # Try both with and without trailing slash
+              curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X DELETE "$WEBDISK_URL/$item" --fail --silent --show-error || \
+              curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X DELETE "$WEBDISK_URL/$item/" --fail --silent --show-error || \
+              echo "⚠️ Could not delete $item (may not exist)"
+            else
+              echo "🛡️ Preserving: $item"
+            fi
+          done
+
+          # 🚀 Deploy new build
+          echo "🚀 Uploading build..."
+
+          # Function to create directory recursively
+          create_remote_dir() {
+            local dir_path="$1"
+            if [[ -z "$dir_path" ]]; then
+              return
+            fi
+            
+            # Remove trailing slash
+            dir_path="${dir_path%/}"
+            
+            # Check if directory exists
+            if curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X PROPFIND "$WEBDISK_URL/$dir_path/" --silent --fail >/dev/null 2>&1; then
+              return 0
+            fi
+            
+            # Create parent directories first
+            local parent_dir=$(dirname "$dir_path")
+            if [[ "$parent_dir" != "." ]] && [[ "$parent_dir" != "/" ]]; then
+              create_remote_dir "$parent_dir"
+            fi
+            
+            # Create this directory
+            echo "📁 Creating directory: $dir_path"
+            curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X MKCOL "$WEBDISK_URL/$dir_path/" \
+              --fail --silent --show-error || \
+            echo "⚠️ Directory may already exist: $dir_path"
+          }
+
+          # Upload files
+          find $BUILD_DIR -type f | while read -r file; do
+            remote_path="${file#$BUILD_DIR/}"
+            remote_dir=$(dirname "$remote_path")
+            
+            # Create remote directories
+            if [[ "$remote_dir" != "." ]]; then
+              create_remote_dir "$remote_dir"
+            fi
+            
+            # Upload file with retry
+            for attempt in {1..3}; do
+              echo "📤 Uploading: $remote_path (attempt $attempt)"
+              
+              if curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD \
+                -T "$file" \
+                "$WEBDISK_URL/$remote_path" \
+                --fail --show-error --progress-bar \
+                -H "Content-Type: $(file -b --mime-type "$file")"; then
+                echo "✅ Uploaded: $remote_path"
+                break
+              elif [[ $attempt -eq 3 ]]; then
+                echo "❌ Failed to upload: $remote_path"
+                echo "File size: $(du -h "$file" | cut -f1)"
+                echo "Remote URL: $WEBDISK_URL/$remote_path"
+                exit 1
+              else
+                echo "⚠️ Retry $attempt/3 for $remote_path"
+                sleep $((attempt * 2))
+              fi
+            done
+          done
+
+          # Verify upload
+          echo "🔍 Verifying deployment..."
+          UPLOADED_COUNT=$(curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -X PROPFIND $WEBDISK_URL/ --silent | xmlstarlet sel -t -v "count(//a:href)" 2>/dev/null || echo "0")
+          echo "Files on server: $UPLOADED_COUNT"
+
+          echo "🎉 Deployment completed successfully!"
+          echo "🌐 Live at: https://operativuz.com"
