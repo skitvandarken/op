@@ -9,197 +9,191 @@
     </button>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="isLoading()" class="loading-skeleton pedido-skeleton" aria-live="polite" aria-busy="true">
-    <div class="skeleton skeleton-header-small"></div>
-    <div class="skeleton skeleton-table"></div>
-    <div class="skeleton skeleton-table short"></div>
-  </div>
-
-  <!-- Empty -->
-  <div *ngIf="!isLoading() && pedidos().length === 0" class="empty-state">
-    <p>Nenhum pedido cadastrado no momento.</p>
-    <button class="btn btn-secondary" (click)="openCreateModal()">
-      Criar o primeiro pedido
-    </button>
-  </div>
-
-  <!-- Table -->
-  <div *ngIf="!isLoading() && pedidos().length > 0" class="table-responsive">
-    <table class="crud-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Tipo</th>
-          <th>Propriedade</th>
-          <th>Cliente</th>
-          <th>Preço</th>
-          <th>Operativo</th>
-          <th>Observações</th>
-          <th class="text-right">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of pedidos()">
-          <td class="font-mono">{{ item.id }}</td>
-          <td>
-            <span class="badge" [ngClass]="item.tipo.toLowerCase()">
-              {{ item.tipo }}
-            </span>
-          </td>
-
-          <!-- Propriedade: shows name (item), tooltip shows ID -->
-          <td [title]="item.idPropriedade">
-            {{ displayPropriedade(item) }}
-          </td>
-
-          <!-- Cliente: shows name, tooltip shows ID -->
-          <td [title]="item.idCliente">
-            {{ displayCliente(item) }}
-          </td>
-
-          <td>{{ item.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</td>
-          <td>{{ displayOperativo(item) }}</td>
-          <td class="obs-cell">{{ item.observacoes || '-' }}</td>
-          <td class="text-right actions-cell">
-            <button class="btn-icon edit" (click)="openEditModal(item)" title="Editar">
-              ✏️ Editar
-            </button>
-            <button class="btn-icon delete" (click)="deletePedido(item.id)" title="Excluir">
-              🗑️ Excluir
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Modal -->
-  <div *ngIf="isModalOpen()" class="modal-overlay" (click)="closeModal()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ editingPedidoId() ? 'Editar Pedido' : 'Novo Pedido' }}</h2>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
-      </div>
-
-      <form [formGroup]="pedidoForm" (ngSubmit)="onSubmit()">
-        <div class="modal-body">
-
-          <!-- ID (read-only) -->
-          <div class="form-group">
-            <label>ID do Pedido</label>
-            <input
-              *ngIf="editingPedidoId(); else newIdHint"
-              type="text"
-              class="readonly-input"
-              [value]="editingPedidoId()"
-              readonly
-            />
-            <ng-template #newIdHint>
-              <div class="info-hint">
-                🔢 O ID será gerado automaticamente ao salvar
-                <small>(ex.: VIS-2609-001)</small>
-              </div>
-            </ng-template>
-          </div>
-
-          <!-- Tipo -->
-          <div class="form-group">
-            <label for="tipo">Tipo de Pedido *</label>
-            <select id="tipo" formControlName="tipo">
-              <option *ngFor="let t of tiposPedido" [value]="t">{{ t }}</option>
-            </select>
-          </div>
-
-          <!-- Propriedade (dropdown) -->
-          <div class="form-group">
-            <label for="idPropriedade">Propriedade *</label>
-            <input
-              id="idPropriedade"
-              type="text"
-              list="pedido-propriedade-search"
-              [value]="propriedadeLookupValue(pedidoForm.get('idPropriedade')?.value)"
-              (change)="selecionarPropriedadePedido($any($event.target).value)"
-              placeholder="Pesquise por nome ou ID"
-            />
-            <datalist id="pedido-propriedade-search">
-              <option *ngFor="let p of propriedades()" [value]="propriedadePesquisaLabel(p)"></option>
-            </datalist>
-            <small
-              class="error-text"
-              *ngIf="pedidoForm.get('idPropriedade')?.touched && pedidoForm.get('idPropriedade')?.invalid"
-            >
-              Selecione uma propriedade.
-            </small>
-          </div>
-
-          <!-- Cliente (pesquisa) -->
-          <div class="form-group">
-            <label for="idCliente">Cliente *</label>
-            <input
-              id="idCliente"
-              type="text"
-              list="pedido-cliente-search"
-              [value]="clienteLookupValue(pedidoForm.get('idCliente')?.value)"
-              (change)="selecionarClientePedido($any($event.target).value)"
-              placeholder="Pesquise por nome ou ID"
-            />
-            <datalist id="pedido-cliente-search">
-              <option *ngFor="let c of clientes()" [value]="clientePesquisaLabel(c)"></option>
-            </datalist>
-            <small
-              class="error-text"
-              *ngIf="pedidoForm.get('idCliente')?.touched && pedidoForm.get('idCliente')?.invalid"
-            >
-              Selecione um cliente.
-            </small>
-          </div>
-
-          <div class="form-group">
-            <label for="preco">Preço (AOA) *</label>
-            <input id="preco" type="number" min="0" step="0.01" formControlName="preco" />
-          </div>
-
-          <div class="form-group">
-            <label for="idOperativo">Operativo</label>
-            <input
-              id="idOperativo"
-              type="text"
-              list="pedido-operativo-search"
-              [value]="operativoLookupValue(pedidoForm.get('idOperativo')?.value)"
-              (change)="selecionarOperativoPedido($any($event.target).value)"
-              placeholder="Pesquise por nome ou ID"
-            />
-            <datalist id="pedido-operativo-search">
-              <option *ngFor="let operativo of operativos()" [value]="operativoPesquisaLabel(operativo)"></option>
-            </datalist>
-          </div>
-
-          <!-- Observações -->
-          <div class="form-group">
-            <label for="observacoes">Observações</label>
-            <textarea
-              id="observacoes"
-              formControlName="observacoes"
-              rows="3"
-              placeholder="Informações adicionais..."
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="pedidoForm.invalid || isSubmitting()"
-          >
-            {{ isSubmitting() ? 'Salvando...' : 'Salvar Pedido' }}
-          </button>
-        </div>
-      </form>
+  @if (isLoading()) {
+    <div class="pedido-loading-skeleton pedido-skeleton" aria-live="polite" aria-busy="true">
+      <div class="pedido-skeleton-item pedido-skeleton-header-small"></div>
+      <div class="pedido-skeleton-item pedido-skeleton-table"></div>
+      <div class="pedido-skeleton-item pedido-skeleton-table short"></div>
     </div>
-  </div>
+  }
+
+  @if (!isLoading() && pedidos().length === 0) {
+    <div class="empty-state">
+      <p>Nenhum pedido cadastrado no momento.</p>
+      <button class="btn btn-secondary" (click)="openCreateModal()">
+        Criar o primeiro pedido
+      </button>
+    </div>
+  }
+
+  @if (!isLoading() && pedidos().length > 0) {
+    <div class="table-responsive">
+      <table class="crud-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tipo</th>
+            <th>Propriedade</th>
+            <th>Cliente</th>
+            <th>Preço</th>
+            <th>Operativo</th>
+            <th>Observações</th>
+            <th class="text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of pedidos()">
+            <td class="font-mono">{{ item.id }}</td>
+            <td>
+              <span class="badge" [ngClass]="item.tipo.toLowerCase()">
+                {{ item.tipo }}
+              </span>
+            </td>
+
+            <td [title]="item.idPropriedade">
+              {{ displayPropriedade(item) }}
+            </td>
+
+            <td [title]="item.idCliente">
+              {{ displayCliente(item) }}
+            </td>
+
+            <td>{{ item.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</td>
+            <td>{{ displayOperativo(item) }}</td>
+            <td class="obs-cell">{{ item.observacoes || '-' }}</td>
+            <td class="text-right actions-cell">
+              <button class="btn-icon edit" (click)="openEditModal(item)" title="Editar">
+                ✏️ Editar
+              </button>
+              <button class="btn-icon delete" (click)="deletePedido(item.id)" title="Excluir">
+                🗑️ Excluir
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (isModalOpen()) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ editingPedidoId() ? 'Editar Pedido' : 'Novo Pedido' }}</h2>
+          <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+
+        <form [formGroup]="pedidoForm" (ngSubmit)="onSubmit()">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>ID do Pedido</label>
+              @if (editingPedidoId()) {
+                <input
+                  type="text"
+                  class="readonly-input"
+                  [value]="editingPedidoId()"
+                  readonly
+                />
+              } @else {
+                <div class="info-hint">
+                  🔢 O ID será gerado automaticamente ao salvar
+                  <small>(ex.: VIS-2609-001)</small>
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="tipo">Tipo de Pedido *</label>
+              <select id="tipo" formControlName="tipo">
+                <option *ngFor="let t of tiposPedido" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="idPropriedade">Propriedade *</label>
+              <input
+                id="idPropriedade"
+                type="text"
+                list="pedido-propriedade-search"
+                [value]="propriedadeLookupValue(pedidoForm.get('idPropriedade')?.value)"
+                (change)="selecionarPropriedadePedido($any($event.target).value)"
+                placeholder="Pesquise por nome ou ID"
+              />
+              <datalist id="pedido-propriedade-search">
+                <option *ngFor="let p of propriedades()" [value]="propriedadePesquisaLabel(p)"></option>
+              </datalist>
+              @if (pedidoForm.get('idPropriedade')?.touched && pedidoForm.get('idPropriedade')?.invalid) {
+                <small class="error-text">
+                  Selecione uma propriedade.
+                </small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="idCliente">Cliente *</label>
+              <input
+                id="idCliente"
+                type="text"
+                list="pedido-cliente-search"
+                [value]="clienteLookupValue(pedidoForm.get('idCliente')?.value)"
+                (change)="selecionarClientePedido($any($event.target).value)"
+                placeholder="Pesquise por nome ou ID"
+              />
+              <datalist id="pedido-cliente-search">
+                <option *ngFor="let c of clientes()" [value]="clientePesquisaLabel(c)"></option>
+              </datalist>
+              @if (pedidoForm.get('idCliente')?.touched && pedidoForm.get('idCliente')?.invalid) {
+                <small class="error-text">
+                  Selecione um cliente.
+                </small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="preco">Preço (AOA) *</label>
+              <input id="preco" type="number" min="0" step="0.01" formControlName="preco" />
+            </div>
+
+            <div class="form-group">
+              <label for="idOperativo">Operativo</label>
+              <input
+                id="idOperativo"
+                type="text"
+                list="pedido-operativo-search"
+                [value]="operativoLookupValue(pedidoForm.get('idOperativo')?.value)"
+                (change)="selecionarOperativoPedido($any($event.target).value)"
+                placeholder="Pesquise por nome ou ID"
+              />
+              <datalist id="pedido-operativo-search">
+                <option *ngFor="let operativo of operativos()" [value]="operativoPesquisaLabel(operativo)"></option>
+              </datalist>
+            </div>
+
+            <div class="form-group">
+              <label for="observacoes">Observações</label>
+              <textarea
+                id="observacoes"
+                formControlName="observacoes"
+                rows="3"
+                placeholder="Informações adicionais..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="pedidoForm.invalid || isSubmitting()"
+            >
+              {{ isSubmitting() ? 'Salvando...' : 'Salvar Pedido' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 </div>

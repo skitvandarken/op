@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Cliente, TipoCliente } from '../../models/cliente.model';
 import { Intermediario } from '../../models/intermediario.model';
@@ -14,6 +14,7 @@ import { IntermediarioService } from '../../services/intermediario';
 import { MeioService } from '../../services/meio';
 import { OperativoService } from '../../services/operativo';
 import { PedidoService } from '../../services/pedido';
+import { WebDiskService } from '../../services/google-drive';
 import { PropriedadeService } from '../../services/propriedade';
 import { ReclamacaoService } from '../../services/reclamacao';
 import { ReceitaService } from '../../services/receita';
@@ -42,6 +43,33 @@ export class DashboardComponent implements OnInit {
 
   isLoading = signal(false);
 
+  pedidosFiltrados = computed<Pedido[]>(() => {
+    const filtro = this.pedidoStatusFilter();
+    const sortMode = this.pedidoSortMode();
+    const lista =
+      filtro === 'Todos'
+        ? [...this.pedidos()]
+        : this.pedidos().filter((pedido) => pedido.status === filtro);
+
+    lista.sort((a, b) => {
+      const dataA = a.criadoEm ?? 0;
+      const dataB = b.criadoEm ?? 0;
+      switch (sortMode) {
+        case 'mais_antigo':
+          return dataA - dataB;
+        case 'maior_valor':
+          return Number(b.preco) - Number(a.preco);
+        case 'menor_valor':
+          return Number(a.preco) - Number(b.preco);
+        case 'mais_recente':
+        default:
+          return dataB - dataA;
+      }
+    });
+
+    return lista;
+  });
+
   clienteForm: FormGroup;
   propriedadeForm: FormGroup;
   operativoForm: FormGroup;
@@ -52,6 +80,8 @@ export class DashboardComponent implements OnInit {
 
   editingClienteId = signal<string | null>(null);
   editingPropriedadeId = signal<string | null>(null);
+  driveUploadStatus = signal('');
+  isUploadingImages = signal(false);
   editingOperativoId = signal<string | null>(null);
   editingMeioId = signal<string | null>(null);
   editingIntermediarioId = signal<string | null>(null);
@@ -68,9 +98,17 @@ export class DashboardComponent implements OnInit {
   showError(form: FormGroup, controlName: string): string | null {
     const control = form.get(controlName);
 
-    if (!control || !(control.touched || control.dirty)) {
-      return null;
-    }
+  if (!control || !(control.touched || control.dirty)) {
+    return null;
+  }
+
+  // FIX: bail out early if the control has no errors at all. Without this,
+  // execution falls through to `return 'Valor inválido.';` and every touched
+  // control shows a bogus error — even valid ones.
+  if (!control.errors) {
+    return null;
+  }
+
 
     if (control.errors?.['required']) {
       return 'Este campo é obrigatório.';
@@ -107,6 +145,7 @@ export class DashboardComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly clienteService: ClienteService,
     private readonly propriedadeService: PropriedadeService,
+    private readonly webDiskService: WebDiskService,
     private readonly operativoService: OperativoService,
     private readonly meioService: MeioService,
     private readonly intermediarioService: IntermediarioService,
@@ -393,6 +432,45 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  getImageUrls(value: string | null | undefined): string[] {
+    return (value ?? '')
+      .split(',')
+      .map((imageUrl) => imageUrl.trim())
+      .filter((imageUrl) => !!imageUrl);
+  }
+
+  async uploadPropertyImagesToWebDisk(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+
+    if (!files.length) {
+      return;
+    }
+
+    this.isUploadingImages.set(true);
+    this.driveUploadStatus.set('A enviar imagens para o WebDisk...');
+
+    try {
+      const uploadedUrls = await this.webDiskService.uploadFiles(files);
+      const existingUrls = (this.propriedadeForm.get('imagens')?.value ?? '')
+        .split(',')
+        .map((value: string) => value.trim())
+        .filter(Boolean);
+
+      const mergedUrls = [...new Set([...existingUrls, ...uploadedUrls])];
+      this.propriedadeForm.patchValue({ imagens: mergedUrls.join(', ') });
+      this.driveUploadStatus.set(`${uploadedUrls.length} imagem(ns) carregada(s) com sucesso no WebDisk.`);
+    } catch (error) {
+      console.error('Erro ao enviar imagens para o WebDisk:', error);
+      this.driveUploadStatus.set(
+        error instanceof Error ? error.message : 'Não foi possível enviar as imagens para o WebDisk.'
+      );
+    } finally {
+      this.isUploadingImages.set(false);
+      input.value = '';
+    }
+  }
+
   // Propriedade handlers
   async savePropriedade(): Promise<void> {
     if (this.propriedadeForm.invalid) {
@@ -407,7 +485,7 @@ export class DashboardComponent implements OnInit {
 
     const value = this.propriedadeForm.getRawValue();
     const intermediarioSelecionado = this.intermediarios().find((item) => item.id === value.idIntermediario);
-    const payload = {
+    const payload: Omit<Propriedade, 'id'> = {
       item: value.item.trim(),
       tipologia: value.tipologia as TipoTipologia,
       descricao: value.descricao.trim(),
@@ -416,7 +494,7 @@ export class DashboardComponent implements OnInit {
         .split(',')
         .map((img: string) => img.trim())
         .filter(Boolean),
-      idIntermediario: value.idIntermediario || undefined,
+      ...(value.idIntermediario ? { idIntermediario: value.idIntermediario } : {}),
       intermediarioNome: intermediarioSelecionado?.nome ?? '',
       localizacao: {
         provincia: value.provincia.trim(),
@@ -464,6 +542,7 @@ export class DashboardComponent implements OnInit {
 
   resetPropriedadeForm(): void {
     this.editingPropriedadeId.set(null);
+    this.driveUploadStatus.set('');
     this.propriedadeForm.reset({
       tipologia: 'T1',
       preco: 0,
@@ -720,29 +799,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getPedidosFiltrados(): Pedido[] {
-    const filtro = this.pedidoStatusFilter();
-    const sortMode = this.pedidoSortMode();
-    const pedidos = filtro === 'Todos'
-      ? [...this.pedidos()]
-      : this.pedidos().filter((pedido) => pedido.status === filtro);
-
-    pedidos.sort((a, b) => {
-      const dataA = a.criadoEm ?? 0;
-      const dataB = b.criadoEm ?? 0;
-      switch (sortMode) {
-        case 'mais_antigo':
-          return dataA - dataB;
-        case 'maior_valor':
-          return Number(b.preco) - Number(a.preco);
-        case 'menor_valor':
-          return Number(a.preco) - Number(b.preco);
-        case 'mais_recente':
-        default:
-          return dataB - dataA;
-      }
-    });
-
-    return pedidos;
+    return this.pedidosFiltrados();
   }
 
   receitaTotal(periodo: PeriodoReceita): number {

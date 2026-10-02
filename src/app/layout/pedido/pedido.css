@@ -140,7 +140,7 @@
 .btn-icon.delete:hover { background-color: #fef2f2; border-color: #fecaca; }
 
 /* States */
-.loading-skeleton, .empty-state {
+.pedido-loading-skeleton, .empty-state {
   text-align: center;
   padding: 3rem;
   background: white;
@@ -155,32 +155,32 @@
   align-items: stretch;
 }
 
-.skeleton {
+.pedido-skeleton-item {
   position: relative;
   overflow: hidden;
   background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
   background-size: 200% 100%;
-  animation: skeleton-pulse 1.2s ease-in-out infinite;
+  animation: pedido-skeleton-pulse 1.2s ease-in-out infinite;
   border-radius: 12px;
 }
 
-@keyframes skeleton-pulse {
+@keyframes pedido-skeleton-pulse {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-.skeleton-header-small {
+.pedido-skeleton-header-small {
   width: 200px;
   height: 26px;
   margin: 0 auto;
 }
 
-.skeleton-table {
+.pedido-skeleton-table {
   width: 100%;
   height: 180px;
 }
 
-.skeleton-table.short {
+.pedido-skeleton-table.short {
   height: 120px;
 }
 

@@ -37,6 +37,32 @@ label {
   grid-column: 1 / -1;
 }
 
+.upload-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-status {
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.uploaded-image-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.uploaded-image-list a {
+  color: #2563eb;
+  font-size: 0.75rem;
+  word-break: break-all;
+}
+
 input,
 select,
 textarea,
@@ -110,7 +136,7 @@ td {
   gap: 0.5rem;
 }
 
-.loading-skeleton,
+.propriedade-loading-skeleton,
 .empty {
   padding: 1rem 0;
   color: #4b5563;
@@ -126,22 +152,36 @@ td {
   padding: 1.25rem;
 }
 
-.skeleton-header-small {
+.propriedade-skeleton-item {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: propriedade-skeleton-pulse 1.2s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+@keyframes propriedade-skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.propriedade-skeleton-header-small {
   width: 180px;
   height: 24px;
 }
 
-.skeleton-form {
+.propriedade-skeleton-form {
   width: 100%;
   height: 280px;
 }
 
-.skeleton-table {
+.propriedade-skeleton-table {
   width: 100%;
   height: 180px;
 }
 
-.skeleton-table.short {
+.propriedade-skeleton-table.short {
   height: 120px;
 }
 

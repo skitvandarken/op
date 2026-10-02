@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Propriedade, TipoTipologia } from '../../models/propriedade.model';
+import { WebDiskService } from '../../services/google-drive';
 import { PropriedadeService } from '../../services/propriedade';
 
 @Component({
@@ -17,6 +18,8 @@ export class PropriedadeCrudComponent implements OnInit {
   isSubmitting = signal(false);
   isEditing = signal(false);
   editingId = signal<string | null>(null);
+  driveUploadStatus = signal('');
+  isUploadingImages = signal(false);
 
   tipologias: TipoTipologia[] = ['T1', 'T2', 'T3', 'T4', 'V1', 'V2', 'V3', 'V4', 'Outro(a)'];
 
@@ -50,7 +53,8 @@ export class PropriedadeCrudComponent implements OnInit {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly propriedadeService: PropriedadeService
+    private readonly propriedadeService: PropriedadeService,
+    private readonly webDiskService: WebDiskService
   ) {
     this.propriedadeForm = this.fb.group({
       item: ['', [Validators.required, Validators.minLength(3)]],
@@ -83,9 +87,17 @@ export class PropriedadeCrudComponent implements OnInit {
     });
   }
 
+  getImageUrls(value: string | null | undefined): string[] {
+    return (value ?? '')
+      .split(',')
+      .map((imageUrl) => imageUrl.trim())
+      .filter((imageUrl) => !!imageUrl);
+  }
+
   openCreateForm(): void {
     this.isEditing.set(false);
     this.editingId.set(null);
+    this.driveUploadStatus.set('');
     this.propriedadeForm.reset({
       item: '',
       tipologia: 'T1',
@@ -102,6 +114,7 @@ export class PropriedadeCrudComponent implements OnInit {
   openEditForm(propriedade: Propriedade): void {
     this.isEditing.set(true);
     this.editingId.set(propriedade.id);
+    this.driveUploadStatus.set('');
     this.propriedadeForm.patchValue({
       item: propriedade.item,
       tipologia: propriedade.tipologia,
@@ -113,6 +126,38 @@ export class PropriedadeCrudComponent implements OnInit {
       rua: propriedade.localizacao?.rua ?? '',
       referencia: propriedade.localizacao?.referencia ?? '',
     });
+  }
+
+  async uploadImagesToWebDisk(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+
+    if (!files.length) {
+      return;
+    }
+
+    this.isUploadingImages.set(true);
+    this.driveUploadStatus.set('A enviar imagens para o WebDisk...');
+
+    try {
+      const uploadedUrls = await this.webDiskService.uploadFiles(files);
+      const existingUrls = (this.propriedadeForm.get('imagens')?.value ?? '')
+        .split(',')
+        .map((value: string) => value.trim())
+        .filter(Boolean);
+
+      const mergedUrls = [...new Set([...existingUrls, ...uploadedUrls])];
+      this.propriedadeForm.patchValue({ imagens: mergedUrls.join(', ') });
+      this.driveUploadStatus.set(`${uploadedUrls.length} imagem(ns) carregada(s) com sucesso no WebDisk.`);
+    } catch (error) {
+      console.error('Erro ao enviar imagens para o WebDisk:', error);
+      this.driveUploadStatus.set(
+        error instanceof Error ? error.message : 'Não foi possível enviar as imagens para o WebDisk.'
+      );
+    } finally {
+      this.isUploadingImages.set(false);
+      input.value = '';
+    }
   }
 
   async save(): Promise<void> {

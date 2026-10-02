@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { collection, doc, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { db } from '../app.config';
 import { NovaReceita, PeriodoReceita, Receita } from '../models/receita.model';
@@ -47,6 +47,16 @@ export class ReceitaService {
       { merge: true }
     );
     return pedidoId;
+  }
+
+  async existeReceitaParaPedido(pedidoId: string): Promise<boolean> {
+    if (!pedidoId) {
+      return false;
+    }
+
+    const ref = doc(db, 'receitas', pedidoId);
+    const snapshot = await getDoc(ref);
+    return snapshot.exists();
   }
 
   totalPorPeriodo(receitas: Receita[], periodo: PeriodoReceita, referencia = new Date()): number {

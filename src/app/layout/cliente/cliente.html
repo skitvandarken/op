@@ -8,19 +8,25 @@
       <label>
         <span>Nome *</span>
         <input type="text" formControlName="nome" />
-        <small class="error-text" *ngIf="showError('nome') as error">{{ error }}</small>
+        @if (showError('nome'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
 
       <label>
         <span>Email *</span>
         <input type="email" formControlName="email" />
-        <small class="error-text" *ngIf="showError('email') as error">{{ error }}</small>
+        @if (showError('email'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
 
       <label>
         <span>Telefone *</span>
         <input type="tel" formControlName="telefone" />
-        <small class="error-text" *ngIf="showError('telefone') as error">{{ error }}</small>
+        @if (showError('telefone'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
 
       <label>
@@ -34,25 +40,33 @@
       <label>
         <span>Cidade *</span>
         <input type="text" formControlName="cidade" />
-        <small class="error-text" *ngIf="showError('cidade') as error">{{ error }}</small>
+        @if (showError('cidade'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
 
       <label>
         <span>Bairro *</span>
         <input type="text" formControlName="bairro" />
-        <small class="error-text" *ngIf="showError('bairro') as error">{{ error }}</small>
+        @if (showError('bairro'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
 
       <label class="full-width">
         <span>Rua *</span>
         <input type="text" formControlName="rua" />
-        <small class="error-text" *ngIf="showError('rua') as error">{{ error }}</small>
+        @if (showError('rua'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
 
       <label class="full-width">
         <span>Observações</span>
         <textarea rows="3" formControlName="observacoes"></textarea>
-        <small class="error-text" *ngIf="showError('observacoes') as error">{{ error }}</small>
+        @if (showError('observacoes'); as error) {
+          <small class="error-text">{{ error }}</small>
+        }
       </label>
     </div>
 
@@ -62,8 +76,10 @@
       </button>
     </div>
 
-    <p class="success" *ngIf="successMessage()">
-      {{ successMessage() }}
-    </p>
+    @if (successMessage()) {
+      <p class="success">
+        {{ successMessage() }}
+      </p>
+    }
   </form>
 </section>

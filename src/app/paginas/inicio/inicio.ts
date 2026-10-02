@@ -63,6 +63,7 @@ export class Inicio implements OnInit, OnDestroy {
   readonly selectedProperty = signal<Propriedade | null>(null);
   readonly isPedidoModalOpen = signal(false);
   readonly isSavingPedido = signal(false);
+  readonly fallbackImage = '/property-fallback.svg';
 
   readonly pedidoForm = this.fb.nonNullable.group({
     nome: ['', [Validators.required, Validators.minLength(2)]],
@@ -134,6 +135,40 @@ export class Inicio implements OnInit, OnDestroy {
   limparFiltro(): void {
     this.filtro.set({ provincia: 'Luanda' });
     this.aplicarFiltro();
+  }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement | null;
+    if (!target) {
+      return;
+    }
+
+    const currentUrl = target.currentSrc || target.src;
+    if (currentUrl.endsWith('/property-fallback.svg')) {
+      return;
+    }
+
+    const normalizedGoogleDriveUrl = this.normalizeGoogleDriveUrl(currentUrl);
+    if (normalizedGoogleDriveUrl !== currentUrl) {
+      target.src = normalizedGoogleDriveUrl;
+      target.onerror = () => {
+        target.src = this.fallbackImage;
+        target.onerror = null;
+      };
+      return;
+    }
+
+    target.src = this.fallbackImage;
+    target.onerror = null;
+  }
+
+  private normalizeGoogleDriveUrl(url: string): string {
+    const match = url.match(/(?:lh3\.googleusercontent\.com\/d\/|drive\.google\.com\/file\/d\/)([a-zA-Z0-9_-]+)/i);
+    if (!match?.[1]) {
+      return url;
+    }
+
+    return `https://drive.usercontent.google.com/download?id=${match[1]}&export=view`;
   }
 
   abrirDetalhe(propriedade: Propriedade): void {

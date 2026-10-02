@@ -47,7 +47,13 @@
       @for (propriedade of propriedades(); track propriedade.id) {
         <article class="property-card">
           @if (propriedade.imagens?.[0]) {
-            <img [ngSrc]="propriedade.imagens[0]" [alt]="propriedade.item" width="800" height="500" />
+            <img
+              [ngSrc]="propriedade.imagens[0]"
+              [alt]="propriedade.item"
+              width="1200"
+              height="800"
+              (error)="onImageError($event)"
+            />
           }
           <div class="card-body">
             <div class="meta-row">

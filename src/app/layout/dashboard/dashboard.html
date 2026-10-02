@@ -12,18 +12,6 @@
     </div>
   </div>
 
-  <div *ngIf="isLoading()" class="loading-skeleton dashboard-skeleton" aria-live="polite" aria-busy="true">
-    <div class="skeleton skeleton-topbar"></div>
-    <div class="skeleton skeleton-tabs"></div>
-    <div class="skeleton skeleton-panel"></div>
-    <div class="skeleton-grid">
-      <div class="skeleton skeleton-card"></div>
-      <div class="skeleton skeleton-card"></div>
-      <div class="skeleton skeleton-card"></div>
-      <div class="skeleton skeleton-card"></div>
-    </div>
-  </div>
-
   <div class="panel" *ngIf="activeTab() === 'clientes'">
     <h2>Clientes</h2>
     <form [formGroup]="clienteForm" (ngSubmit)="saveCliente()" class="form-grid">
@@ -137,8 +125,17 @@
         </datalist>
       </label>
       <label class="full">
-        <span>Imagens</span>
-        <input type="text" formControlName="imagens" />
+        <span>Imagens da propriedade</span>
+        <div class="upload-row">
+          <input type="file" accept="image/*" multiple (change)="uploadPropertyImagesToWebDisk($event)" />
+          <span class="upload-status" *ngIf="driveUploadStatus()">{{ driveUploadStatus() }}</span>
+
+          <div class="uploaded-image-list" *ngIf="getImageUrls(propriedadeForm.get('imagens')?.value).length">
+            <ng-container *ngFor="let imageUrl of getImageUrls(propriedadeForm.get('imagens')?.value)">
+              <a [href]="imageUrl" target="_blank" rel="noopener noreferrer">{{ imageUrl }}</a>
+            </ng-container>
+          </div>
+        </div>
         <small class="error-text" *ngIf="showError(propriedadeForm, 'imagens') as error">{{ error }}</small>
       </label>
       <label>

@@ -1,234 +1,143 @@
-<section class="inicio-shell">
-  <header class="hero">
-    <mat-card class="hero-card" aria-label="Propriedades em destaque">
-      <div class="hero-card-header">
-        <span class="badge">Em destaque</span>
-        <strong>{{ propriedadesDestaque().length }} propriedades</strong>
-      </div>
+<section class="landing-page">
+  <header class="topbar">
+    <img
+      src="https://fluxo-digital.com/uploads/operativuz_logo.png"
+      alt="Operativuz"
+      class="brand-logo"
+    />
 
-      @if (isLoadingPropriedades()) {
-        <div class="slideshow-shell skeleton-shell" aria-busy="true" aria-live="polite">
-          <div class="skeleton skeleton-hero-image"></div>
-          <div class="skeleton skeleton-hero-line short"></div>
-          <div class="skeleton skeleton-hero-line"></div>
-          <div class="skeleton skeleton-hero-line tiny"></div>
-        </div>
-      } @else if (propriedadesDestaque().length) {
-        <div
-          class="slideshow-shell uk-position-relative uk-visible-toggle uk-light"
-          tabindex="-1"
-          uk-slideshow="animation: fade; autoplay: true; autoplay-interval: 4200; pause-on-hover: true; ratio: 16:9;"
-        >
-          <ul class="uk-slideshow-items">
-            @for (propriedade of propriedadesDestaque(); track propriedade.id) {
-              <li>
-                @if (propriedade.imagens?.[0]) {
-                  <img
-                    [ngSrc]="propriedade.imagens[0]"
-                    [alt]="propriedade.item"
-                    class="slideshow-image"
-                    width="900"
-                    height="620"
-                    priority
-                    fetchpriority="high"
-                    decoding="async"
-                    sizes="(max-width: 768px) 100vw, 65vw"
-                  />
-                }
-
-                <div class="slideshow-overlay">
-                  <span class="featured-label">{{ propriedade.tipologia }}</span>
-                  <h3>{{ propriedade.item }}</h3>
-                  <p>{{ propriedade.localizacao?.bairro }} · {{ propriedade.localizacao?.provincia }}</p>
-                  <strong>{{ propriedade.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
-                </div>
-              </li>
-            }
-          </ul>
-
-          <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slideshow-item="previous"></a>
-          <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slideshow-item="next"></a>
-
-          <div class="uk-slideshow-nav uk-dotnav uk-flex-center uk-margin-bottom"></div>
-        </div>
-      }
-    </mat-card>
-
-    <div class="hero-copy">
-      <span class="eyebrow">Residencial</span>
-      <h1>Arrende sua próxima casa sem dores de cabeça com ajuda dos nossos operativos e da nossa tecnologia.</h1>
-      <p>
-        Oferecemos soluções para locação, manutenção, visitas e organização de imóveis com
-        atenção ao detalhe e atendimento profissional.
-      </p>
-      <div class="hero-actions">
-        <a mat-flat-button color="primary" routerLink="/propriedades">Ver propriedades</a>
-        <a mat-stroked-button color="primary" routerLink="/servicos">Ver serviços</a>
-      </div>
-    </div>
+    <a
+      class="whatsapp-btn"
+      href="https://wa.me/244951074711?text=Olá%20Operativuz%2C%20quero%20arrendar%20uma%20casa%20em%20Luanda."
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      WhatsApp
+    </a>
   </header>
-  <section class="services">
-    <div class="section-heading">
-      <span>Serviços</span>
-      <h2>Tipos de serviço</h2>
+
+  <main class="hero-section">
+    <div class="hero-copy">
+      <span class="eyebrow">Sem stress · Sem burocracia</span>
+      <h1>Procuras casa para arrendar em Luanda?</h1>
+      <p class="lead">
+        Com a Operativuz, o processo de arrendamento é simples, rápido e seguro.
+      </p>
+
+      <div class="cta-group">
+        <a
+          class="primary-cta"
+          href="https://wa.me/244951074711?text=Olá%20Operativuz%2C%20quero%20agendar%20uma%20visita%20de%20casas%20em%20Luanda."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Falar no WhatsApp
+        </a>
+        <a class="secondary-cta" href="#bairros">Ver bairros</a>
+      </div>
+
+      <ul class="feature-list">
+        <li>Escolhes as casas no WhatsApp.</li>
+        <li>O nosso operativo leva-te de mota até às visitas.</li>
+        <li>Pagas só a corrida e ajudamos a fechar o contrato.</li>
+      </ul>
     </div>
 
-    <div class="service-grid">
-      @for (servico of servicos; track servico.nome) {
-        <article class="service-card">
-          <div class="icon material-symbols-rounded" aria-hidden="true">{{ servico.icone }}</div>
-          <h3>{{ servico.nome }}</h3>
-          <p>{{ servico.descricao }}</p>
-        </article>
-      }
+    <div class="hero-panel">
+      <div class="panel-card">
+        <p class="panel-kicker">Bairros em destaque</p>
+        <ul id="bairros" class="area-list">
+          <li>Morro Bento</li>
+          <li>Kikagil</li>
+          <li>Gamek à Direita</li>
+          <li>Futungo</li>
+          <li>Vila da Gamek</li>
+          <li>Camama</li>
+          <li>Benfica</li>
+          <li>Cassenda</li>
+          <li>Mártires do Kifangondo</li>
+          <li>Samba</li>
+          <li>Corimba</li>
+          <li>Morro da Luz</li>
+          <li>Patriota</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <strong>📍 Loja Física &amp; Escritório</strong>
+        <span>Shopping Nosso Centro, Gamek - Morro Bento</span>
+      </div>
+
+      <div class="info-box whatsapp-box">
+        <strong>💬 Queres agendar?</strong>
+        <span>Manda um “Olá” para o WhatsApp:</span>
+        <a href="https://wa.me/244951074711" target="_blank" rel="noopener noreferrer">+244 951 074 711</a>
+      </div>
+    </div>
+  </main>
+
+  <section class="steps-section">
+    <div class="section-title-wrap">
+      <span class="section-tag">Como funciona</span>
+      <h2>O caminho mais simples para a tua casa nova</h2>
+    </div>
+
+    <div class="steps-grid">
+      <article class="step-card">
+        <div class="step-number">1</div>
+        <h3>Escolhes</h3>
+        <p>Selecionas as casas que te interessam no WhatsApp.</p>
+      </article>
+
+      <article class="step-card">
+        <div class="step-number">2</div>
+        <h3>Visitas</h3>
+        <p>O nosso operativo leva-te de mota até às visitas.</p>
+      </article>
+
+      <article class="step-card">
+        <div class="step-number">3</div>
+        <h3>Contrato</h3>
+        <p>Pagas só a corrida e ajudamos a fechar o contrato.</p>
+      </article>
     </div>
   </section>
 
-  <section class="properties">
-    <div class="section-heading">
-      <span>Propriedades</span>
-      <h2>Em destaque</h2>
+  <section class="services-panel">
+    <div class="section-title-wrap left-align">
+      <span class="section-tag">Atenção extra</span>
+      <h2>Além da casa, cuidamos do resto</h2>
     </div>
 
-    <div class="location-filter" aria-label="Filtro por localização em Luanda">
-      <mat-form-field appearance="outline">
-        <mat-label>Luanda</mat-label>
-        <mat-select [value]="filtroBairro()" (selectionChange)="atualizarBairro($event.value)">
-          <mat-option value="">Todos os bairros</mat-option>
-          @for (bairro of bairros(); track bairro) {
-            <mat-option [value]="bairro">{{ bairro }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <button mat-stroked-button type="button" class="clear-btn" (click)="limparFiltro()">Limpar</button>
+    <div class="service-row">
+      <div class="service-pill">Mudança</div>
+      <div class="service-pill">Limpeza</div>
+      <div class="service-pill">Acompanhamento</div>
+      <div class="service-pill">Suporte ao contrato</div>
     </div>
 
-    <div class="property-grid">
-      @if (isLoadingPropriedades()) {
-        @for (item of [1,2,3]; track item) {
-          <article class="property-card skeleton-card" aria-busy="true">
-            <div class="skeleton skeleton-image"></div>
-            <div class="card-body">
-              <div class="meta-row">
-                <span class="skeleton skeleton-chip"></span>
-                <span class="skeleton skeleton-price"></span>
-              </div>
-              <div class="skeleton skeleton-line"></div>
-              <div class="skeleton skeleton-line short"></div>
-              <div class="skeleton skeleton-line tiny"></div>
-              <div class="skeleton skeleton-button"></div>
-            </div>
-          </article>
-        }
-      } @else {
-        @for (propriedade of propriedades(); track propriedade.id) {
-          <article class="property-card">
-            @if (propriedade.imagens?.[0]) {
-              <img
-                [ngSrc]="propriedade.imagens[0]"
-                [alt]="propriedade.item"
-                width="800"
-                height="500"
-                loading="lazy"
-                decoding="async"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-            }
-            <div class="card-body">
-              <div class="meta-row">
-                <span class="tag">{{ propriedade.tipologia }}</span>
-                <strong>{{ propriedade.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
-              </div>
-              <h3>{{ propriedade.item }}</h3>
-              <p>{{ propriedade.descricao }}</p>
-              <small>{{ propriedade.localizacao?.bairro }} · {{ propriedade.localizacao?.provincia }}</small>
-              <div class="card-actions">
-                <button mat-stroked-button color="primary" type="button" (click)="abrirDetalhe(propriedade)">
-                  Ver detalhes
-                </button>
-              </div>
-            </div>
-          </article>
-        }
-      }
-    </div>
+    <p class="extra-copy">
+      Ainda tratamos da tua mudança e da limpeza da casa nova se precisares.
+    </p>
   </section>
+
+  <section class="cta-banner">
+    <div>
+      <span class="section-tag white">Queres agendar?</span>
+      <h2>Manda um “Olá” no WhatsApp e começa hoje mesmo.</h2>
+    </div>
+
+    <a
+      class="primary-cta large"
+      href="https://wa.me/244951074711?text=Olá%20Operativuz%2C%20quero%20agendar%20uma%20visita%20para%20alugar%20uma%20casa."
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Enviar mensagem
+    </a>
+  </section>
+
+  <footer class="landing-footer">
+    <p>#Operativuz #ArrendamentoLuanda #CasasLuanda #MorroBento #Talatona #SemStress</p>
+  </footer>
 </section>
-
-@if (isPedidoModalOpen() && selectedProperty(); as propriedade) {
-  <div class="modal-backdrop" (click)="fecharModal()">
-    <div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="propriedade-modal-title" (click)="$event.stopPropagation()">
-      <button type="button" class="close-modal" aria-label="Fechar" (click)="fecharModal()">×</button>
-
-      <div class="modal-media">
-        @if (propriedade.imagens?.[0]) {
-          <img
-            [ngSrc]="propriedade.imagens[0]"
-            [alt]="propriedade.item"
-            width="900"
-            height="620"
-            loading="lazy"
-            decoding="async"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        }
-      </div>
-
-      <div class="modal-content">
-        <span class="tag">{{ propriedade.tipologia }}</span>
-        <h3 id="propriedade-modal-title">{{ propriedade.item }}</h3>
-        <div class="modal-meta">
-          <span>{{ propriedade.localizacao?.bairro }}</span>
-          <span>{{ propriedade.localizacao?.provincia }}</span>
-        </div>
-        <p>{{ propriedade.descricao }}</p>
-
-        <div class="modal-price-row">
-          <span>Preço</span>
-          <strong>{{ propriedade.preco | currency:'AOA':'symbol-narrow':'1.2-2' }}</strong>
-        </div>
-
-        <form [formGroup]="pedidoForm" (ngSubmit)="enviarPedido()" class="pedido-form">
-          <div class="field-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>Nome</mat-label>
-              <input matInput formControlName="nome" placeholder="Seu nome" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="email" type="email" placeholder="exemplo@email.com" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Telefone</mat-label>
-              <input matInput formControlName="telefone" type="tel" placeholder="9xx xxx xxx" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Tipo de pedido</mat-label>
-              <mat-select formControlName="tipo">
-                @for (tipo of tiposPedidoDisponiveis; track tipo) {
-                  <mat-option [value]="tipo">{{ tipo }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Observações</mat-label>
-            <textarea matInput formControlName="observacoes" rows="4" placeholder="Descreva o que precisa."></textarea>
-          </mat-form-field>
-
-          <div class="modal-actions">
-            <button mat-stroked-button type="button" (click)="fecharModal()">Cancelar</button>
-            <button mat-flat-button color="primary" type="submit" [disabled]="isSavingPedido()">
-              {{ isSavingPedido() ? 'A guardar...' : 'Solicitar pedido' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-}

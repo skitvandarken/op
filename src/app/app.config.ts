@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
@@ -97,6 +97,42 @@ const intermediariosSeed: Omit<Intermediario, 'id'>[] = [
     criadoEm: Date.now() - 86400000,
     atualizadoEm: Date.now() - 86400000,
   },
+  {
+    nome: 'Rosa Ferreira',
+    email: 'rosa.ferreira@residencial.ao',
+    telefone: '+244 933 220 110',
+    cidade: 'Benguela',
+    bairro: 'Centro',
+    rua: 'Rua das Acácias',
+    documento: 'PT-0003',
+    observacoes: 'Especialista em imóveis familiares e alugueres.',
+    criadoEm: Date.now() - 172800000,
+    atualizadoEm: Date.now() - 172800000,
+  },
+  {
+    nome: 'Carlos Almeida',
+    email: 'carlos.almeida@imovelmais.ao',
+    telefone: '+244 912 778 990',
+    cidade: 'Huambo',
+    bairro: 'Morro Bento',
+    rua: 'Avenida 12',
+    documento: 'PT-0004',
+    observacoes: 'Atua com vendas de terrenos e negócios.',
+    criadoEm: Date.now() - 259200000,
+    atualizadoEm: Date.now() - 259200000,
+  },
+  {
+    nome: 'Sofia Mendes',
+    email: 'sofia.mendes@solarquila.ao',
+    telefone: '+244 941 654 321',
+    cidade: 'Namibe',
+    bairro: 'Praia do Porto',
+    rua: 'Rua da Esperança',
+    documento: 'PT-0005',
+    observacoes: 'Intermedia vendas de apartamentos e casas na costa.',
+    criadoEm: Date.now() - 345600000,
+    atualizadoEm: Date.now() - 345600000,
+  },
 ];
 
 const operativosSeed: Omit<Operativo, 'id'>[] = [
@@ -171,6 +207,40 @@ const meiosSeed: Omit<Meio, 'id'>[] = [
 ];
 
 const propriedadesSeed: Omit<Propriedade, 'id'>[] = [
+  {
+    item: 'Teste GDrive',
+    tipologia: 'T2',
+    descricao: 'Propriedade de exemplo para validar o upload e a renderização de imagens com o Google Drive.',
+    preco: 295000,
+    imagens: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+    ],
+    idIntermediario: 'INT-2609-003',
+    intermediarioNome: 'Rosa Ferreira',
+    localizacao: {
+      provincia: 'Luanda',
+      bairro: 'Talatona',
+      rua: 'Rua do Teste GDrive',
+      referencia: 'Exemplo de destaque para o Google Drive.',
+    },
+  },
+  {
+    item: 'Teste GDrive 2',
+    tipologia: 'V2',
+    descricao: 'Segunda propriedade de exemplo para assegurar a renderização do fallback e do carregamento de imagens.',
+    preco: 420000,
+    imagens: [
+      'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+    ],
+    idIntermediario: 'INT-2609-004',
+    intermediarioNome: 'Carlos Almeida',
+    localizacao: {
+      provincia: 'Luanda',
+      bairro: 'Miramar',
+      rua: 'Rua da Verificação',
+      referencia: 'Exemplo de prova visual da API de imagens.',
+    },
+  },
   {
     item: 'Casa da Praia',
     tipologia: 'V2',
@@ -694,6 +764,9 @@ async function seedMockData(): Promise<void> {
   await seedCollection('intermediarios', [
     { id: 'INT-2609-001', ...intermediariosSeed[0] },
     { id: 'INT-2609-002', ...intermediariosSeed[1] },
+    { id: 'INT-2609-003', ...intermediariosSeed[2] },
+    { id: 'INT-2609-004', ...intermediariosSeed[3] },
+    { id: 'INT-2609-005', ...intermediariosSeed[4] },
   ]);
 
   await seedCollection('operativos', [
@@ -738,8 +811,5 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(),
     provideAnimationsAsync(),
-    provideAppInitializer(() => {
-      void seedMockData();
-    }),
   ],
 };
