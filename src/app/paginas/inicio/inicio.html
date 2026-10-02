@@ -1,143 +1,30 @@
-<section class="landing-page">
-  <header class="topbar">
-    <img
-      src="https://fluxo-digital.com/uploads/operativuz_logo.png"
-      alt="Operativuz"
-      class="brand-logo"
-    />
+<main class="landing-shell">
+  <section class="redirect-card" aria-live="polite">
+    <img [src]="logoUrl" alt="Operativuz" class="brand-logo" />
 
-    <a
-      class="whatsapp-btn"
-      href="https://wa.me/244951074711?text=Olá%20Operativuz%2C%20quero%20arrendar%20uma%20casa%20em%20Luanda."
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      WhatsApp
-    </a>
-  </header>
+    <p class="eyebrow">Arrendar em Luanda</p>
 
-  <main class="hero-section">
-    <div class="hero-copy">
-      <span class="eyebrow">Sem stress · Sem burocracia</span>
-      <h1>Procuras casa para arrendar em Luanda?</h1>
-      <p class="lead">
-        Com a Operativuz, o processo de arrendamento é simples, rápido e seguro.
-      </p>
+    <h1>Estamos a encaminhar-te para o WhatsApp da Operativuz.</h1>
 
-      <div class="cta-group">
-        <a
-          class="primary-cta"
-          href="https://wa.me/244951074711?text=Olá%20Operativuz%2C%20quero%20agendar%20uma%20visita%20de%20casas%20em%20Luanda."
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Falar no WhatsApp
-        </a>
-        <a class="secondary-cta" href="#bairros">Ver bairros</a>
-      </div>
-
-      <ul class="feature-list">
-        <li>Escolhes as casas no WhatsApp.</li>
-        <li>O nosso operativo leva-te de mota até às visitas.</li>
-        <li>Pagas só a corrida e ajudamos a fechar o contrato.</li>
-      </ul>
-    </div>
-
-    <div class="hero-panel">
-      <div class="panel-card">
-        <p class="panel-kicker">Bairros em destaque</p>
-        <ul id="bairros" class="area-list">
-          <li>Morro Bento</li>
-          <li>Kikagil</li>
-          <li>Gamek à Direita</li>
-          <li>Futungo</li>
-          <li>Vila da Gamek</li>
-          <li>Camama</li>
-          <li>Benfica</li>
-          <li>Cassenda</li>
-          <li>Mártires do Kifangondo</li>
-          <li>Samba</li>
-          <li>Corimba</li>
-          <li>Morro da Luz</li>
-          <li>Patriota</li>
-        </ul>
-      </div>
-
-      <div class="info-box">
-        <strong>📍 Loja Física &amp; Escritório</strong>
-        <span>Shopping Nosso Centro, Gamek - Morro Bento</span>
-      </div>
-
-      <div class="info-box whatsapp-box">
-        <strong>💬 Queres agendar?</strong>
-        <span>Manda um “Olá” para o WhatsApp:</span>
-        <a href="https://wa.me/244951074711" target="_blank" rel="noopener noreferrer">+244 951 074 711</a>
-      </div>
-    </div>
-  </main>
-
-  <section class="steps-section">
-    <div class="section-title-wrap">
-      <span class="section-tag">Como funciona</span>
-      <h2>O caminho mais simples para a tua casa nova</h2>
-    </div>
-
-    <div class="steps-grid">
-      <article class="step-card">
-        <div class="step-number">1</div>
-        <h3>Escolhes</h3>
-        <p>Selecionas as casas que te interessam no WhatsApp.</p>
-      </article>
-
-      <article class="step-card">
-        <div class="step-number">2</div>
-        <h3>Visitas</h3>
-        <p>O nosso operativo leva-te de mota até às visitas.</p>
-      </article>
-
-      <article class="step-card">
-        <div class="step-number">3</div>
-        <h3>Contrato</h3>
-        <p>Pagas só a corrida e ajudamos a fechar o contrato.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="services-panel">
-    <div class="section-title-wrap left-align">
-      <span class="section-tag">Atenção extra</span>
-      <h2>Além da casa, cuidamos do resto</h2>
-    </div>
-
-    <div class="service-row">
-      <div class="service-pill">Mudança</div>
-      <div class="service-pill">Limpeza</div>
-      <div class="service-pill">Acompanhamento</div>
-      <div class="service-pill">Suporte ao contrato</div>
-    </div>
-
-    <p class="extra-copy">
-      Ainda tratamos da tua mudança e da limpeza da casa nova se precisares.
+    <p class="lead">
+      Escolhes a casa, marcamos a visita e ajudamos a fechar o contrato sem complicações.
     </p>
-  </section>
 
-  <section class="cta-banner">
-    <div>
-      <span class="section-tag white">Queres agendar?</span>
-      <h2>Manda um “Olá” no WhatsApp e começa hoje mesmo.</h2>
+    <div class="actions">
+      <a
+        class="primary-action"
+        [href]="whatsappUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Continuar para o WhatsApp
+      </a>
+
+      <button type="button" class="secondary-action" (click)="redirectToWhatsapp()">
+        Redirecionar agora
+      </button>
     </div>
 
-    <a
-      class="primary-cta large"
-      href="https://wa.me/244951074711?text=Olá%20Operativuz%2C%20quero%20agendar%20uma%20visita%20para%20alugar%20uma%20casa."
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Enviar mensagem
-    </a>
+    <p class="contact-line">+244 951 074 711 • Shopping Nosso Centro • Gamek</p>
   </section>
-
-  <footer class="landing-footer">
-    <p>#Operativuz #ArrendamentoLuanda #CasasLuanda #MorroBento #Talatona #SemStress</p>
-  </footer>
-</section>
+</main>
